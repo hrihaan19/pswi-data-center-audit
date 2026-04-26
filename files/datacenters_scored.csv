@@ -1,0 +1,54 @@
+company,facility_id,facility_name,city,state_province,country,latitude,longitude,annual_wue_l_per_kwh,wue_source,reported_year,facility_type,notes,location_key,bws_raw,climate_zone,peaking_factor,pwue,pswi,pswi_rank
+Google,GOOG-CBF,Council Bluffs,Council Bluffs,Iowa,USA,41.2619,-95.8608,1.4,Google 2024 Environmental Report,2023,hyperscale,Site-specific WUE disclosed,Council Bluffs,0.18,temperate,4.0,5.6,1.008,29
+Google,GOOG-DLS,The Dalles,The Dalles,Oregon,USA,45.5946,-121.1787,2.6,Google 2024 Environmental Report,2023,hyperscale,Columbia River basin,The Dalles,0.1,mild,2.5,6.5,0.65,32
+Google,GOOG-DAL,Dalles Mid-Columbia,The Dalles,Oregon,USA,45.6113,-121.1934,2.6,Google 2024 Environmental Report,2023,hyperscale,Same basin as DLS,The Dalles,0.1,mild,2.5,6.5,0.65,32
+Google,GOOG-MCM,Mayes County,Pryor,Oklahoma,USA,36.3115,-95.3208,1.7,Google 2024 Environmental Report,2023,hyperscale,Tulsa metropolitan area,Pryor OK,0.32,temperate,4.0,6.8,2.176,22
+Google,GOOG-DOU,Douglas County,Douglasville,Georgia,USA,33.7515,-84.7477,1.5,Google 2024 Environmental Report,2023,hyperscale,Atlanta metropolitan area,Douglasville,0.42,hot_humid,6.0,9.0,3.78,12
+Google,GOOG-LEN,Lenoir,Lenoir,North Carolina,USA,35.914,-81.539,0.7,Google 2024 Environmental Report,2023,hyperscale,Catawba River basin,Lenoir,0.18,temperate,4.0,2.8,0.504,33
+Google,GOOG-MON,Montgomery County,Pryor,Tennessee,USA,36.529,-87.3595,0.9,Google 2024 Environmental Report,2023,hyperscale,Cumberland River area,Pryor OK,0.32,temperate,4.0,3.6,1.1520000000000001,27
+Google,GOOG-CHI,Berkeley County,Goose Creek,South Carolina,USA,33.0185,-80.0298,1.5,Google 2024 Environmental Report,2023,hyperscale,Charleston area,Goose Creek SC,0.3,hot_humid,6.0,9.0,2.6999999999999997,19
+Google,GOOG-HEN,Henderson,Henderson,Nevada,USA,36.0395,-114.9817,0.9,Google 2024 Environmental Report,2023,hyperscale,Las Vegas metropolitan area,Henderson NV,1.2,hot_arid,8.0,7.2,8.64,5
+Google,GOOG-LOU,Loudoun County,Ashburn,Virginia,USA,39.0438,-77.4874,1.8,Google 2024 Environmental Report,2023,hyperscale,Northern Virginia data center alley,Ashburn VA,0.45,temperate,4.0,7.2,3.24,15
+Google,GOOG-EEM,Eemshaven,Eemshaven,Groningen,Netherlands,53.4458,6.8358,0.1,Google 2024 Environmental Report,2023,hyperscale,Sea-water cooling,Eemshaven,0.05,cool,1.8,0.18000000000000002,0.009000000000000001,48
+Google,GOOG-HAM,Hamina,Hamina,Kymenlaakso,Finland,60.5694,27.1973,0.1,Google 2024 Environmental Report,2023,hyperscale,Sea-water cooling,Hamina,0.02,cool,1.8,0.18000000000000002,0.0036000000000000003,49
+Google,GOOG-DUB,Dublin,Dublin,Leinster,Ireland,53.4129,-6.2438,0.1,Google 2024 Environmental Report,2023,hyperscale,,Dublin Ireland,0.08,mild,2.5,0.25,0.02,46
+Google,GOOG-STG,St. Ghislain,Saint-Ghislain,Hainaut,Belgium,50.4595,3.8254,0.4,Google 2024 Environmental Report,2023,hyperscale,,Saint-Ghislain,0.32,mild,2.5,1.0,0.32,37
+Google,GOOG-CHL,Changhua County,Changhua,Taiwan,Taiwan,24.0517,120.5161,1.6,Google 2024 Environmental Report,2023,hyperscale,,Changhua Taiwan,0.85,hot_humid,6.0,9.600000000000001,8.16,6
+Google,GOOG-SIN,Singapore,Jurong,Singapore,Singapore,1.3206,103.6883,1.3,Google 2024 Environmental Report,2023,hyperscale,,Singapore,0.95,hot_humid,6.0,7.800000000000001,7.41,7
+Microsoft,MSFT-IAW,Quincy,Quincy,Washington,USA,47.2349,-119.8527,0.49,Microsoft 2024 Sustainability Report,2023,hyperscale,Columbia River basin,Quincy WA,0.1,mild,2.5,1.225,0.12250000000000001,41
+Microsoft,MSFT-IAS,San Antonio,San Antonio,Texas,USA,29.4241,-98.4936,1.8,Microsoft 2024 Sustainability Report,2023,hyperscale,Edwards Aquifer area,San Antonio,0.55,hot_humid,6.0,10.8,5.940000000000001,9
+Microsoft,MSFT-AZ,Goodyear/Phoenix,Goodyear,Arizona,USA,33.4356,-112.3576,1.2,Microsoft 2024 Sustainability Report,2023,hyperscale,Phoenix metro area,Goodyear AZ,1.4,hot_arid,8.0,9.6,13.44,2
+Microsoft,MSFT-VA,Boydton,Boydton,Virginia,USA,36.6671,-78.3875,0.49,Microsoft 2024 Sustainability Report,2023,hyperscale,Mecklenburg County,Boydton VA,0.25,temperate,4.0,1.96,0.49,34
+Microsoft,MSFT-IA,Des Moines,West Des Moines,Iowa,USA,41.5772,-93.7113,0.49,Microsoft 2024 Sustainability Report,2023,hyperscale,Iowa data center hub,West Des Moines,0.25,temperate,4.0,1.96,0.49,34
+Microsoft,MSFT-IRL,Dublin,Dublin,Leinster,Ireland,53.4129,-6.2438,0.49,Microsoft 2024 Sustainability Report,2023,hyperscale,,Dublin Ireland,0.08,mild,2.5,1.225,0.098,42
+Microsoft,MSFT-NLD,Amsterdam,Amsterdam,North Holland,Netherlands,52.3676,4.9041,0.49,Microsoft 2024 Sustainability Report,2023,hyperscale,,Amsterdam,0.1,mild,2.5,1.225,0.12250000000000001,41
+Microsoft,MSFT-SGP,Singapore,Tuas,Singapore,Singapore,1.3147,103.6385,1.8,Microsoft 2024 Sustainability Report,2023,hyperscale,,Tuas SG,0.95,hot_humid,6.0,10.8,10.26,3
+Meta,META-PRN,Prineville,Prineville,Oregon,USA,44.2998,-120.8338,0.26,Meta 2024 Sustainability Report,2023,hyperscale,High desert location,Prineville OR,0.55,mild,2.5,0.65,0.35750000000000004,35
+Meta,META-FOR,Fort Worth,Fort Worth,Texas,USA,32.7555,-97.3308,0.26,Meta 2024 Sustainability Report,2023,hyperscale,,Fort Worth,0.5,hot_humid,6.0,1.56,0.78,30
+Meta,META-LUL,Lulea,Lulea,Norrbotten,Sweden,65.5848,22.1547,0.26,Meta 2024 Sustainability Report,2023,hyperscale,Subarctic free cooling,Lulea,0.02,cool,1.8,0.468,0.00936,47
+Meta,META-CLO,Clonee,Clonee,Leinster,Ireland,53.4072,-6.4364,0.26,Meta 2024 Sustainability Report,2023,hyperscale,,Clonee,0.08,mild,2.5,0.65,0.052000000000000005,43
+Meta,META-NEW,Newton County,Newton County,Georgia,USA,33.5615,-83.8493,0.26,Meta 2024 Sustainability Report,2023,hyperscale,Reported strain on local water authority,Newton County,0.42,hot_humid,6.0,1.56,0.6552,31
+Meta,META-LAC,Los Lunas,Los Lunas,New Mexico,USA,34.8088,-106.7333,0.26,Meta 2024 Sustainability Report,2023,hyperscale,Rio Grande basin,Los Lunas,1.3,hot_arid,8.0,2.08,2.704,18
+Meta,META-EAG,Eagle Mountain,Eagle Mountain,Utah,USA,40.3144,-112.0064,0.26,Meta 2024 Sustainability Report,2023,hyperscale,Utah Lake basin,Eagle Mountain UT,1.1,hot_arid,8.0,2.08,2.2880000000000003,21
+Meta,META-MES,Mesa,Mesa,Arizona,USA,33.4152,-111.8315,0.26,Meta 2024 Sustainability Report,2023,hyperscale,Phoenix metro area,Mesa AZ,1.4,hot_arid,8.0,2.08,2.912,17
+Meta,META-RIC,Richland Parish,Richland Parish,Louisiana,USA,32.4049,-91.6637,0.26,Amazon 2024 Sustainability Report,2024,hyperscale,Major Louisiana AI buildout,Richland Parish,0.2,hot_humid,6.0,1.56,0.31200000000000006,38
+Amazon,AMZN-IA,Boardman,Boardman,Oregon,USA,45.8398,-119.7008,0.18,Amazon 2024 Sustainability Report,2023,hyperscale,Columbia River basin,Boardman,0.1,mild,2.5,0.44999999999999996,0.045,44
+Amazon,AMZN-VA,Loudoun County,Ashburn,Virginia,USA,39.0438,-77.4874,0.18,Amazon 2024 Sustainability Report,2023,hyperscale,Northern Virginia data center alley,Ashburn VA,0.45,temperate,4.0,0.72,0.324,36
+Amazon,AMZN-CA,Loudoun (CMH),Hilliard,Ohio,USA,40.0334,-83.1597,0.18,Amazon 2024 Sustainability Report,2023,hyperscale,,Hilliard,0.2,temperate,4.0,0.72,0.144,39
+Amazon,AMZN-TX,Coffeen,Coffeen,Illinois,USA,39.0892,-89.3956,0.18,Amazon 2024 Sustainability Report,2023,hyperscale,,Coffeen IL,0.18,temperate,4.0,0.72,0.1296,40
+Amazon,AMZN-IRL,Dublin,Dublin,Leinster,Ireland,53.4129,-6.2438,0.18,Amazon 2024 Sustainability Report,2023,hyperscale,,Dublin Ireland,0.08,mild,2.5,0.44999999999999996,0.036,45
+Amazon,AMZN-FRA,Frankfurt,Frankfurt am Main,Hesse,Germany,50.1109,8.6821,0.18,Amazon 2024 Sustainability Report,2023,hyperscale,,Frankfurt,0.32,mild,2.5,0.44999999999999996,0.144,39
+Amazon,AMZN-SGP,Singapore,Singapore,Singapore,Singapore,1.3521,103.8198,0.18,Amazon 2024 Sustainability Report,2023,hyperscale,,Singapore,0.95,hot_humid,6.0,1.08,1.026,28
+Equinix,EQIX-DC1,Ashburn (DC1-15),Ashburn,Virginia,USA,39.0438,-77.4874,1.07,Equinix 2024 Sustainability Report,2023,colocation,Multiple Ashburn campus,Ashburn VA,0.45,temperate,4.0,4.28,1.9260000000000002,24
+Equinix,EQIX-SV,Silicon Valley (SV1-10),San Jose,California,USA,37.3382,-121.8863,1.07,Equinix 2024 Sustainability Report,2023,colocation,,San Jose CA,0.85,temperate,4.0,4.28,3.638,14
+Equinix,EQIX-LA,Los Angeles (LA1-5),El Segundo,California,USA,33.9192,-118.4165,1.07,Equinix 2024 Sustainability Report,2023,colocation,,El Segundo CA,1.1,temperate,4.0,4.28,4.708000000000001,10
+Equinix,EQIX-DA,Dallas (DA1-11),Dallas,Texas,USA,32.7767,-96.797,1.07,Equinix 2024 Sustainability Report,2023,colocation,,Dallas TX,0.5,hot_humid,6.0,6.42,3.21,16
+Equinix,EQIX-LD,London (LD1-10),London,England,UK,51.5074,-0.1278,1.07,Equinix 2024 Sustainability Report,2023,colocation,,London UK,0.45,mild,2.5,2.6750000000000003,1.20375,26
+Equinix,EQIX-SG,Singapore (SG1-5),Singapore,Singapore,Singapore,1.3521,103.8198,1.07,Equinix 2024 Sustainability Report,2023,colocation,,Singapore,0.95,hot_humid,6.0,6.42,6.098999999999999,8
+DigitalRealty,DRT-IAD,Northern Virginia (IAD),Manassas,Virginia,USA,38.7509,-77.4753,1.32,Digital Realty 2024 Impact Report,2023,colocation,,Manassas VA,0.45,temperate,4.0,5.28,2.3760000000000003,20
+DigitalRealty,DRT-DAL,Dallas (DAL),Garland,Texas,USA,32.9126,-96.6389,1.32,Digital Realty 2024 Impact Report,2023,colocation,,Garland TX,0.5,hot_humid,6.0,7.92,3.96,11
+DigitalRealty,DRT-PHX,Phoenix (PHX),Chandler,Arizona,USA,33.3062,-111.8413,1.32,Digital Realty 2024 Impact Report,2023,colocation,Severely water-stressed,Chandler AZ,1.4,hot_arid,8.0,10.56,14.783999999999999,1
+DigitalRealty,DRT-SLC,Salt Lake City (SLC),Salt Lake City,Utah,USA,40.7608,-111.891,1.32,Digital Realty 2024 Impact Report,2023,colocation,,Salt Lake City,0.95,hot_arid,8.0,10.56,10.032,4
+QTS,QTS-ATL,Atlanta-Suwanee,Suwanee,Georgia,USA,34.0515,-84.0713,1.45,QTS 2024 Sustainability Report,2023,colocation,,Suwanee GA,0.42,hot_humid,6.0,8.7,3.6539999999999995,13
+QTS,QTS-RIC,Richmond,Richmond,Virginia,USA,37.5407,-77.436,1.45,QTS 2024 Sustainability Report,2023,colocation,,Richmond VA,0.3,temperate,4.0,5.8,1.74,25
+xAI,XAI-MEM,Memphis Colossus,Memphis,Tennessee,USA,35.1495,-90.049,1.5,Press release / news estimate,2024,hyperscale,Estimated WUE - limited disclosure,Memphis,0.22,hot_humid,6.0,9.0,1.98,23
