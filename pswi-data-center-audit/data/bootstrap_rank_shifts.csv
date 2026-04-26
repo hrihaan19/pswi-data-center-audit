@@ -1,0 +1,9 @@
+,mean_shift,median_shift,ci_low,ci_high,significant
+Amazon,-0.0185,0.0,0.0,0.0,False
+DigitalRealty,-2.193,-2.0,-4.0,0.0,False
+Equinix,-2.0495,-2.0,-4.0,0.0,False
+Google,0.3405,0.0,-2.0,4.0,False
+Meta,-0.099,0.0,-1.0,0.0,False
+Microsoft,-2.5695,-3.0,-5.0,1.0,False
+QTS,1.983,2.0,0.0,4.0,False
+xAI,4.242,4.0,3.0,5.0,True
