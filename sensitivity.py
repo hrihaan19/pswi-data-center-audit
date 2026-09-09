@@ -21,9 +21,15 @@ from pathlib import Path
 from scipy.stats import spearmanr
 
 # -----------------------------------------------------------------------------
-ROOT = Path(__file__).parent.parent
-DATA = ROOT / 'data'
-FIG  = ROOT / 'figures'
+HERE = Path(__file__).resolve().parent
+# The published repository is flat (CSVs and PNGs beside this script), but a
+# nested data/ + figures/ layout is also supported. Pick whichever exists.
+if (HERE / 'datacenters_scored.csv').exists():
+    DATA = FIG = HERE
+else:
+    ROOT = HERE.parent
+    DATA = ROOT / 'data'
+    FIG  = ROOT / 'figures'
 
 plt.rcParams.update({
     'font.family':'DejaVu Sans','font.size':10,
@@ -436,6 +442,98 @@ def scope2_sensitivity():
 
 
 # =============================================================================
+# Analysis 7 -- NULL SPECIFICATION: beta identically 1
+# =============================================================================
+def beta_null_specification():
+    """Company rank stability when the peaking factor is removed entirely.
+
+    Our climate-zone beta is correlated with BWS (hot arid regions both peak
+    harder and sit in stressed catchments), so location enters PSWI twice.
+    Rescaling beta uniformly cannot test this -- it preserves rank order by
+    construction. The real test is deleting the climate differential: set
+    beta == 1 for every facility, so PSWI = WUE * BWS, and ask whether the
+    company rank shifts reported in the paper survive.
+    """
+    print("\n" + "="*72)
+    print("ANALYSIS 7: NULL SPECIFICATION (beta identically 1)")
+    print("="*72)
+
+    df = scored.copy()
+    df['pswi_b1'] = df['annual_wue_l_per_kwh'] * df['bws_raw']   # beta == 1
+
+    comp = df.groupby('company').agg(
+        wue=('annual_wue_l_per_kwh', 'mean'),
+        pswi=('pswi', 'mean'),
+        pswi_b1=('pswi_b1', 'mean'),
+        n_facilities=('pswi', 'size'),
+    ).reset_index()
+
+    for col in ['wue', 'pswi', 'pswi_b1']:
+        comp[col + '_rank'] = comp[col].rank(method='dense', ascending=True).astype(int)
+
+    comp['shift_main'] = comp['wue_rank'] - comp['pswi_rank']
+    comp['shift_b1']   = comp['wue_rank'] - comp['pswi_b1_rank']
+    comp = comp.sort_values('wue_rank').reset_index(drop=True)
+
+    rho_main_b1, _ = spearmanr(comp['pswi_rank'],  comp['pswi_b1_rank'])
+    rho_wue_main, _ = spearmanr(comp['wue_rank'],  comp['pswi_rank'])
+    rho_wue_b1, _   = spearmanr(comp['wue_rank'],  comp['pswi_b1_rank'])
+
+    print("\nCompany ranks (1 = best / lowest impact):")
+    print(comp[['company', 'n_facilities', 'wue_rank', 'pswi_rank',
+                'pswi_b1_rank', 'shift_main', 'shift_b1']].to_string(index=False))
+
+    print(f"\nSpearman rho (main PSWI ranks vs beta==1 ranks): {rho_main_b1:.4f}")
+    print(f"Spearman rho (WUE ranks vs main PSWI ranks):     {rho_wue_main:.4f}")
+    print(f"Spearman rho (WUE ranks vs beta==1 ranks):       {rho_wue_b1:.4f}")
+
+    reversed_sign = comp[(comp['shift_main'] * comp['shift_b1']) < 0]
+    print(f"\nCompanies whose shift reverses direction under beta==1: "
+          f"{len(reversed_sign)}"
+          + ("" if len(reversed_sign) == 0 else
+             " -> " + ", ".join(reversed_sign['company'])))
+
+    # facility-level check as well
+    rho_fac, _ = spearmanr(df['pswi'].rank(ascending=False),
+                           df['pswi_b1'].rank(ascending=False))
+    top10_main = set(df.nlargest(10, 'pswi')['facility_name'])
+    top10_b1   = set(df.nlargest(10, 'pswi_b1')['facility_name'])
+    print(f"\nFacility level: Spearman rho = {rho_fac:.4f}, "
+          f"worst-10 overlap = {len(top10_main & top10_b1)}/10")
+
+    comp.to_csv(DATA / 'beta_null_specification.csv', index=False)
+    print(f"Saved: {DATA / 'beta_null_specification.csv'}")
+
+    # Figure: slopegraph of company rank under the two specifications
+    fig, ax = plt.subplots(figsize=(9, 6))
+    for _, r in comp.iterrows():
+        moved = r['pswi_rank'] != r['pswi_b1_rank']
+        ax.plot([0, 1, 2],
+                [r['wue_rank'], r['pswi_rank'], r['pswi_b1_rank']],
+                marker='o', lw=2.0 if moved else 1.2,
+                color=COLORS['bad'] if moved else COLORS['neutral'],
+                alpha=0.9, zorder=3)
+        ax.annotate(r['company'], xy=(2.03, r['pswi_b1_rank']),
+                    va='center', fontsize=9)
+    ax.set_xticks([0, 1, 2])
+    ax.set_xticklabels(['Self-reported\nWUE',
+                        r'PSWI' + '\n' + r'(climate-zone $\beta$)',
+                        r'PSWI' + '\n' + r'($\beta \equiv 1$)'])
+    ax.set_ylabel('Company rank (1 = best)')
+    ax.set_xlim(-0.25, 2.6)
+    ax.invert_yaxis()
+    ax.set_title('Rank Shifts Survive Removal of the Peaking Factor\n'
+                 rf'Spearman $\rho$ = {rho_main_b1:.3f} between the two PSWI specifications',
+                 fontweight='bold', pad=14)
+    ax.grid(True, axis='y', linestyle=':', alpha=0.4)
+    out = FIG / 'figure_11_beta_null.png'
+    plt.savefig(out, bbox_inches='tight'); plt.close()
+    print(f"Saved: {out}")
+
+    return rho_main_b1, rho_wue_main, comp
+
+
+# =============================================================================
 if __name__ == '__main__':
     rho_h, rho_d, half_overlap, dbl_overlap, perturb_rho, perturb_overlap = beta_sensitivity()
     boot_sum = bootstrap_ranks(n_boot=2000)
@@ -443,6 +541,7 @@ if __name__ == '__main__':
     cf_med, cf_lo, cf_hi = uncertainty_counterfactual(n_runs=500)
     case_pairs = same_operator_case_study()
     s2_rho, s2_overlap = scope2_sensitivity()
+    rho_b1, rho_wue_pswi, comp_ranks = beta_null_specification()
 
     print("\n" + "="*72)
     print("REVISION ANALYSES SUMMARY  (use these numbers in the paper)")
@@ -452,3 +551,5 @@ if __name__ == '__main__':
     print(f"VARIANCE SHARE:                WUE = {sw*100:.1f}%, β = {sb*100:.1f}%, BWS = {ss*100:.1f}%, cov = {sc*100:.1f}%")
     print(f"COUNTERFACTUAL (with uncertainty): median = {cf_med:.1f}%, 95% CI [{cf_lo:.1f}, {cf_hi:.1f}]")
     print(f"SCOPE 2 ROBUSTNESS:            ρ = {s2_rho:.3f}, top-10 overlap = {s2_overlap}/10")
+    print(f"NULL SPEC (β ≡ 1):              ρ = {rho_b1:.3f} vs main PSWI ranks")
+    print(f"WUE vs PSWI company ranks:     ρ = {rho_wue_pswi:.3f}")
