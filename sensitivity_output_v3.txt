@@ -1,0 +1,132 @@
+
+========================================================================
+ANALYSIS 1: BETA SENSITIVITY (Reviewer point #1)
+========================================================================
+
+[Test A] Uniform multiplier (β x 0.5, x 2.0):
+  base ∩ (β×0.5):    10/10
+  base ∩ (β×2.0):    10/10
+  Spearman ρ (uniform): 1.0000 (×0.5), 1.0000 (×2.0)
+  NOTE: ρ = 1.0 by construction: a uniform multiplier scales every PSWI equally.
+
+[Test B] Per-facility independent ±50% perturbation (1000 runs):
+  Spearman ρ (mean): 0.9784
+  Spearman ρ (5th pctl): 0.9691
+  Top-10 overlap (mean): 8.7/10
+  Top-10 overlap (5th pctl): 8/10
+Saved: /tmp/claude-0/-home-claude/fc440688-bb34-58ef-918b-1284ab724dad/scratchpad/pipe/data/sensitivity_beta.csv
+Saved: /tmp/claude-0/-home-claude/fc440688-bb34-58ef-918b-1284ab724dad/scratchpad/pipe/figures/figure_7_beta_sensitivity.png
+
+========================================================================
+ANALYSIS 2: BOOTSTRAP RANK STABILITY (Reviewer point #5)
+========================================================================
+Running 2000 bootstrap iterations...
+
+95% CI on company rank shifts (WUE rank - PSWI rank; positive = ranks BETTER under PSWI):
+               mean_shift  median_shift  ci_low  ci_high  significant
+Amazon              -0.04           0.0    -1.0      1.0        False
+DigitalRealty       -2.04          -3.0    -3.0      1.0        False
+Equinix             -0.35           0.0    -1.0      1.0        False
+Google               2.03           2.0     0.0      4.0        False
+Meta                -0.59          -1.0    -2.0      1.0        False
+Microsoft            0.21           0.0    -2.0      2.0        False
+QTS                  0.80           1.0    -1.0      3.0        False
+Saved: /tmp/claude-0/-home-claude/fc440688-bb34-58ef-918b-1284ab724dad/scratchpad/pipe/data/bootstrap_rank_shifts.csv
+Saved: /tmp/claude-0/-home-claude/fc440688-bb34-58ef-918b-1284ab724dad/scratchpad/pipe/figures/figure_8_bootstrap_shifts.png
+
+========================================================================
+ANALYSIS 3: VARIANCE DECOMPOSITION (Reviewer point #8)
+========================================================================
+  Pairwise covariance shares: WUE-beta   2.0%, WUE-BWS   5.8%, beta-BWS  23.9%
+  corr(log beta, log BWS) = 0.842; corr(log WUE, log BWS) = 0.094
+Var(log PSWI) = 3.369
+  log(WUE):       Var = 0.954  share =  28.3%
+  log(beta):      Var = 0.199  share =   5.9%
+  log(BWS):       Var = 1.147  share =  34.1%
+  Covariances:                 share =  31.7%
+  TOTAL share:                       = 100.0%
+Saved: /tmp/claude-0/-home-claude/fc440688-bb34-58ef-918b-1284ab724dad/scratchpad/pipe/data/variance_decomposition.csv
+Saved: /tmp/claude-0/-home-claude/fc440688-bb34-58ef-918b-1284ab724dad/scratchpad/pipe/figures/figure_9_variance_decomposition.png
+
+========================================================================
+ANALYSIS 4: PROPER UNCERTAINTY PROPAGATION (Reviewer point #2)
+========================================================================
+WUE  ± 15% (corporate reporting precision)
+BWS  ± 25% (Aqueduct 4.0 model uncertainty)
+beta ± 30% (Han et al. 2026 observed range)
+Running 500 Monte Carlo iterations...
+
+At 10% reallocation:
+  Median:  35.1%
+  95% CI:  [20.9%, 46.1%]
+  50% CI:  [31.3%, 38.5%]
+At 20.3% reallocation: median 57.5%, 95% CI [48.1%, 63.9%]
+At 29.7% reallocation: median 67.3%, 95% CI [60.1%, 72.7%]
+Saved: /tmp/claude-0/-home-claude/fc440688-bb34-58ef-918b-1284ab724dad/scratchpad/pipe/figures/figure_10_counterfactual_uncertain.png
+
+========================================================================
+ANALYSIS 5: SAME-OPERATOR CASE STUDY (Reviewer point #7)
+========================================================================
+
+Google in-company pairs with similar WUE, very different impact:
+
+  LOWER IMPACT: Hamina (Finland)
+     WUE = 0.96 L/kWh, BWS = 0.02, PSWI = 0.0346
+  HIGHER IMPACT: Henderson (USA)
+     WUE = 0.96 L/kWh, BWS = 1.2, PSWI = 9.2160
+  PSWI ratio: 267× (same operator, similar self-reported WUE)
+
+  LOWER IMPACT: Hamina (Finland)
+     WUE = 0.96 L/kWh, BWS = 0.02, PSWI = 0.0346
+  HIGHER IMPACT: Singapore (Singapore)
+     WUE = 0.96 L/kWh, BWS = 0.95, PSWI = 5.4720
+  PSWI ratio: 158× (same operator, similar self-reported WUE)
+
+  LOWER IMPACT: Hamina (Finland)
+     WUE = 0.96 L/kWh, BWS = 0.02, PSWI = 0.0346
+  HIGHER IMPACT: Changhua County (Taiwan)
+     WUE = 0.96 L/kWh, BWS = 0.85, PSWI = 4.8960
+  PSWI ratio: 142× (same operator, similar self-reported WUE)
+
+========================================================================
+ANALYSIS 6: SCOPE 2 ROBUSTNESS (Reviewer point #10)
+========================================================================
+Adding uniform Scope 2 grid water: 3.14 L/kWh
+Spearman ρ(Scope 1 rank, Scope 1+2 rank) = 0.8816
+Top-10 worst overlap: 6/10
+Mean |rank change|: 5.21 positions
+
+========================================================================
+ANALYSIS 7: NULL SPECIFICATION (beta identically 1)
+========================================================================
+
+Company ranks (1 = best / lowest impact):
+      company  n_facilities  wue_rank  pswi_rank  pswi_b1_rank  shift_main  shift_b1
+       Amazon             6         1          1             1           0         0
+         Meta             8         2          3             3          -1        -1
+    Microsoft             8         3          2             2           1         1
+DigitalRealty             3         4          7             6          -3        -2
+          QTS             2         5          4             4           1         1
+      Equinix             6         6          6             7           0        -1
+       Google            15         7          5             5           2         2
+
+Spearman rho (main PSWI ranks vs beta==1 ranks): 0.9643
+Spearman rho (WUE ranks vs main PSWI ranks):     0.7143
+Spearman rho (WUE ranks vs beta==1 ranks):       0.7857
+
+Companies whose shift reverses direction under beta==1: 0
+
+Facility level: Spearman rho = 0.9629, worst-10 overlap = 9/10
+Saved: /tmp/claude-0/-home-claude/fc440688-bb34-58ef-918b-1284ab724dad/scratchpad/pipe/data/beta_null_specification.csv
+Saved: /tmp/claude-0/-home-claude/fc440688-bb34-58ef-918b-1284ab724dad/scratchpad/pipe/figures/figure_11_beta_null.png
+
+========================================================================
+REVISION ANALYSES SUMMARY  (use these numbers in the paper)
+========================================================================
+BETA SENSITIVITY (uniform):    rho(β×0.5) = 1.000, rho(β×2.0) = 1.000
+BETA SENSITIVITY (per-facility ±50%):  mean ρ = 0.978, mean top-10 overlap = 8.7/10
+VARIANCE SHARE:                WUE = 28.3%, β = 5.9%, BWS = 34.1%, cov = 31.7%
+COUNTERFACTUAL (with uncertainty): median = 35.1%, 95% CI [20.9, 46.1]
+SCOPE 2 ROBUSTNESS:            ρ = 0.882, top-10 overlap = 6/10
+NULL SPEC (β ≡ 1):              ρ = 0.964 vs main PSWI ranks
+WUE vs PSWI company ranks:     ρ = 0.714

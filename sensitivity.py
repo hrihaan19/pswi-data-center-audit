@@ -44,11 +44,13 @@ COLORS = {'best':'#1b9e77','good':'#66c2a5','neutral':'#888888',
 scored = pd.read_csv(DATA / 'datacenters_scored.csv')
 
 # -----------------------------------------------------------------------------
-# Documented uncertainties from the literature
+# ASSUMED relative input uncertainties (1-sigma). These are modelling
+# assumptions chosen to be generous, not values taken from a published error
+# model; the paper states them as such.
 # -----------------------------------------------------------------------------
-WUE_REL_UNCERTAINTY  = 0.15  # Corporate reporting precision
-BWS_REL_UNCERTAINTY  = 0.25  # PCR-GLOBWB 2 / Aqueduct 4.0 model uncertainty
-BETA_REL_UNCERTAINTY = 0.30  # Han et al. (2026) observed peaking factor range
+WUE_REL_UNCERTAINTY  = 0.15  # assumed: reporting / fleet-to-site transfer error
+BWS_REL_UNCERTAINTY  = 0.25  # assumed: hydrological-model and catchment-assignment error
+BETA_REL_UNCERTAINTY = 0.30  # assumed: peaking-factor misspecification
 
 
 # =============================================================================
@@ -84,7 +86,7 @@ def beta_sensitivity():
     print(f"  base ∩ (β×0.5):    {len(base10 & half10)}/10")
     print(f"  base ∩ (β×2.0):    {len(base10 & dbl10)}/10")
     print(f"  Spearman ρ (uniform): {rho_h:.4f} (×0.5), {rho_d:.4f} (×2.0)")
-    print("  NOTE: ρ = 1.0 by construction since β is constant within climate zones.")
+    print("  NOTE: ρ = 1.0 by construction: a uniform multiplier scales every PSWI equally.")
 
     # Test 2: STRICTER -- per-facility independent perturbation. This is the
     # honest test the reviewer would actually want: if EACH facility's
@@ -136,7 +138,7 @@ def beta_sensitivity():
     ax.set_ylabel('Facility PSWI rank (1 = worst)')
     ax.invert_yaxis()
     ax.set_title('(a) Uniform $\\beta$ rescaling\n'
-                 r'Spearman $\rho = 1.000$ (constant within climate zone)',
+                 r'Ranks unchanged by construction (every PSWI scaled equally)',
                  fontweight='bold')
     ax.grid(True, axis='y', linestyle=':', alpha=0.4)
 
@@ -204,7 +206,7 @@ def bootstrap_ranks(n_boot=2000):
     summary['ci_high']      = np.percentile(shifts, 97.5, axis=0)
     summary['significant']  = (summary['ci_low']>0) | (summary['ci_high']<0)
 
-    print("\n95% CI on company rank shifts (positive = looks worse under PSWI):")
+    print("\n95% CI on company rank shifts (WUE rank - PSWI rank; positive = ranks BETTER under PSWI):")
     print(summary.round(2).to_string())
 
     summary.to_csv(DATA / 'bootstrap_rank_shifts.csv')
@@ -219,7 +221,8 @@ def bootstrap_ranks(n_boot=2000):
         parts = ax.violinplot([data], positions=[i], widths=0.7,
                               showmeans=False, showmedians=False, showextrema=False)
         sig = summary.loc[c,'significant']
-        face = (COLORS['worst'] if sig and summary.loc[c,'mean_shift']>0
+        # shift = WUE rank - PSWI rank: negative = ranks worse under PSWI
+        face = (COLORS['worst'] if sig and summary.loc[c,'mean_shift']<0
                 else COLORS['best'] if sig else COLORS['neutral'])
         for pc in parts['bodies']:
             pc.set_facecolor(face); pc.set_alpha(0.6)
@@ -228,9 +231,9 @@ def bootstrap_ranks(n_boot=2000):
     ax.axhline(0, color='black', lw=0.8, ls='--', alpha=0.6)
     ax.set_xticks(np.arange(len(order)))
     ax.set_xticklabels(order, rotation=15, ha='right')
-    ax.set_ylabel('Rank shift (WUE rank $-$ PSWI rank)\n$> 0$ = looks worse under PSWI')
+    ax.set_ylabel('Rank shift (WUE rank $-$ PSWI rank)\n$< 0$ = ranks worse under PSWI')
     ax.set_title(f'Bootstrap Distribution of Company Rank Shifts ({n_boot} resamples)\n'
-                 f'95% CI shown as black bars; red = significant deterioration, green = significant improvement',
+                 f'Black bars: 95% CI; red/green = CI excludes zero (worse/better under PSWI)',
                  fontweight='bold', pad=14)
     ax.grid(True, axis='y', linestyle=':', alpha=0.4)
     out = FIG / 'figure_8_bootstrap_shifts.png'
@@ -257,9 +260,16 @@ def variance_decomposition():
     v_w   = np.var(log_wue)
     v_b   = np.var(log_beta)
     v_s   = np.var(log_bws)
-    cwb   = np.cov(log_wue,  log_beta)[0,1]
-    cws   = np.cov(log_wue,  log_bws )[0,1]
-    cbs   = np.cov(log_beta, log_bws )[0,1]
+    # bias=True (divide by n) to match np.var's default ddof=0; mixing the
+    # two conventions made the v2 shares sum to 100.9%.
+    cwb   = np.cov(log_wue,  log_beta, bias=True)[0,1]
+    cws   = np.cov(log_wue,  log_bws,  bias=True)[0,1]
+    cbs   = np.cov(log_beta, log_bws,  bias=True)[0,1]
+    print(f"  Pairwise covariance shares: WUE-beta {2*cwb/var_p*100:5.1f}%, "
+          f"WUE-BWS {2*cws/var_p*100:5.1f}%, beta-BWS {2*cbs/var_p*100:5.1f}%")
+    from scipy.stats import pearsonr
+    print(f"  corr(log beta, log BWS) = {pearsonr(log_beta, log_bws)[0]:.3f}; "
+          f"corr(log WUE, log BWS) = {pearsonr(log_wue, log_bws)[0]:.3f}")
     cov_total = 2*cwb + 2*cws + 2*cbs
 
     sw = v_w  / var_p
@@ -355,6 +365,10 @@ def uncertainty_counterfactual(n_runs=500):
     print(f"  Median:  {pmed[idx10]:.1f}%")
     print(f"  95% CI:  [{pl95[idx10]:.1f}%, {ph95[idx10]:.1f}%]")
     print(f"  50% CI:  [{pl50[idx10]:.1f}%, {ph50[idx10]:.1f}%]")
+    for tgt in (0.20, 0.30):
+        k = np.argmin(np.abs(fr - tgt))
+        print(f"At {fr[k]*100:.1f}% reallocation: median {pmed[k]:.1f}%, "
+              f"95% CI [{pl95[k]:.1f}%, {ph95[k]:.1f}%]")
 
     fig, ax = plt.subplots(figsize=(10, 6.2))
     ax.fill_between(fr*100, pl95, ph95, color=COLORS['accent'], alpha=0.18, label='95% CI')
@@ -370,8 +384,8 @@ def uncertainty_counterfactual(n_runs=500):
                     fontsize=8, color=COLORS['worst'], fontweight='bold')
     ax.set_xlabel('% of fleet workload reallocated (worst third $\\to$ best third)')
     ax.set_ylabel('Reduction in fleet PSWI impact (%)')
-    ax.set_title('Counterfactual with Full Uncertainty Propagation\n'
-                 r'(WUE $\pm$15%, BWS $\pm$25%, $\beta$ $\pm$30%)',
+    ax.set_title('Frictionless Reallocation Counterfactual with Assumed Input Uncertainty\n'
+                 r'(WUE $\pm$15%, BWS $\pm$25%, $\beta$ $\pm$30%, 1$\sigma$)',
                  fontweight='bold', pad=14)
     ax.legend(loc='lower right')
     ax.grid(True, linestyle=':', alpha=0.5)
@@ -425,7 +439,8 @@ def scope2_sensitivity():
     print("ANALYSIS 6: SCOPE 2 ROBUSTNESS (Reviewer point #10)")
     print("="*72)
 
-    SCOPE2_AVG = 1.5  # L/kWh, EPRI/NREL US grid average
+    SCOPE2_AVG = 3.14  # L/kWh, U.S. average electricity water-consumption
+                       # intensity used by Li et al. (2025, CACM)
     print(f"Adding uniform Scope 2 grid water: {SCOPE2_AVG} L/kWh")
 
     df = scored.copy()
@@ -516,13 +531,13 @@ def beta_null_specification():
         ax.annotate(r['company'], xy=(2.03, r['pswi_b1_rank']),
                     va='center', fontsize=9)
     ax.set_xticks([0, 1, 2])
-    ax.set_xticklabels(['Self-reported\nWUE',
+    ax.set_xticklabels(['Operator\nWUE',
                         r'PSWI' + '\n' + r'(climate-zone $\beta$)',
                         r'PSWI' + '\n' + r'($\beta \equiv 1$)'])
     ax.set_ylabel('Company rank (1 = best)')
     ax.set_xlim(-0.25, 2.6)
     ax.invert_yaxis()
-    ax.set_title('Rank Shifts Survive Removal of the Peaking Factor\n'
+    ax.set_title('Company Ranks With and Without the Peaking Factor\n'
                  rf'Spearman $\rho$ = {rho_main_b1:.3f} between the two PSWI specifications',
                  fontweight='bold', pad=14)
     ax.grid(True, axis='y', linestyle=':', alpha=0.4)

@@ -100,13 +100,13 @@ def figure_1_shell_game():
     ax.set_yticklabels(df['company'], fontsize=11)
     ax.invert_yaxis()  # reported_rank = 1 at top
 
-    ax.set_xlabel('Rank  (1 = best, 8 = worst)')
+    ax.set_xlabel(f'Rank  (1 = best, {n} = worst)')
     ax.set_xticks(np.arange(1, n+1))
     ax.set_xlim(0.5, n + 0.5)
 
     # Custom legend
     legend_elements = [
-        Line2D([0],[0], marker='o', color='w', label='Self-reported WUE rank',
+        Line2D([0],[0], marker='o', color='w', label='Operator WUE rank',
                markerfacecolor=COLORS['neutral'], markeredgecolor='black',
                markersize=10),
         Line2D([0],[0], marker='o', color='w', label='PSWI rank — looks worse',
@@ -116,16 +116,16 @@ def figure_1_shell_game():
                markerfacecolor=COLORS['best'], markeredgecolor='black',
                markersize=11),
     ]
-    ax.legend(handles=legend_elements, loc='lower right',
+    ax.legend(handles=legend_elements, loc='upper right',
               frameon=True, fancybox=True, shadow=False)
 
-    ax.set_title('The Shell Game: Self-Reported WUE Rankings vs. Stress-Weighted PSWI Rankings',
+    ax.set_title('Company Rankings: Operator WUE vs. Mean Facility PSWI',
                  fontweight='bold', pad=14)
 
     # Footnote
     fig.text(0.02, -0.02,
-             'Source: Authors\' analysis using corporate sustainability reports (2023-2024) '
-             'and WRI Aqueduct 4.0 baseline water stress data.\n'
+             'Source: Author\'s analysis of operator WUE, published or derived from published totals (2023-2025), '
+             'and WRI Aqueduct 4.0 baseline water stress.\n'
              'PSWI = peaking-adjusted WUE × baseline water stress; lower is better.',
              fontsize=8, style='italic', color='#444')
 
@@ -164,7 +164,8 @@ def figure_2_disparity():
     ax.set_xticks(positions)
     ax.set_xticklabels(order, rotation=15, ha='right')
     ax.set_ylabel('PSWI score  (log scale)')
-    ax.set_title('PSWI Distribution by Company: A 4,000× Disparity Hidden by Annual Averages',
+    ratio = scored['pswi'].max() / scored['pswi'].min()
+    ax.set_title(f'PSWI Distribution by Company (best-to-worst ratio {ratio:,.0f}×)',
                  fontweight='bold', pad=14)
     ax.grid(True, axis='y', linestyle=':', alpha=0.5, which='both')
 
@@ -235,7 +236,7 @@ def figure_3_world_map():
     ax.set_xlabel('Longitude')
     ax.set_ylabel('Latitude')
     ax.grid(True, linestyle=':', alpha=0.3, zorder=0)
-    ax.set_title('Global PSWI Distribution: Hyperscale and Major Colocation Data Centers',
+    ax.set_title('Audited Facilities by PSWI (five highest labeled)',
                  fontweight='bold', pad=14)
 
     # Colorbar
@@ -243,11 +244,16 @@ def figure_3_world_map():
     cbar.set_label('log\u2081\u2080(PSWI score)', rotation=270, labelpad=15)
 
     # Annotate the worst offenders
-    worst5 = scored.nlargest(5, 'pswi')
-    for _, row in worst5.iterrows():
-        ax.annotate(row['facility_name'],
+    # Stagger labels (alternate above/below, ordered by longitude) so that
+    # nearby facilities (Henderson/Chandler; two Singapore sites) stay legible.
+    worst5 = scored.nlargest(5, 'pswi').sort_values('longitude')
+    for k, (_, row) in enumerate(worst5.iterrows()):
+        dy = 10 if k % 2 == 0 else -16
+        east = row['longitude'] > 110          # keep clear of the colorbar
+        ax.annotate(f"{row['company']}, {row['facility_name']}",
                     xy=(row['longitude'], row['latitude']),
-                    xytext=(8, 8), textcoords='offset points',
+                    xytext=(-10 if east else 10, dy), textcoords='offset points',
+                    ha='right' if east else 'left',
                     fontsize=8, color=COLORS['worst'], fontweight='bold')
 
     out = FIG / 'figure_3_world_map.png'
@@ -282,16 +288,17 @@ def figure_4_wue_vs_pswi():
                    c=climate_colors[cz], label=cz.replace('_',' ').title(),
                    s=110, alpha=0.85, edgecolor='black', linewidth=0.5)
 
-    ax.set_xlabel('Self-Reported Annual WUE (L/kWh)')
+    ax.set_xlabel('Operator annual WUE applied to facility (L/kWh)')
     ax.set_ylabel('PSWI Score (peak × stress)')
     ax.set_yscale('log')
-    ax.set_title('Why Annual WUE Hides the Truth: Same WUE, Vastly Different Impact',
+    ax.set_title('Same Fleet WUE, Different PSWI',
                  fontweight='bold', pad=14)
 
-    # Annotate two facilities with similar WUE but very different PSWI
-    # to show the dispersion explicitly
-    near_wue_15 = scored[(scored['annual_wue_l_per_kwh'] >= 1.2) & 
-                          (scored['annual_wue_l_per_kwh'] <= 1.6)]
+    # Annotate the largest group of facilities that share one published WUE
+    # value (one operator's fleet figure): the spread within it is entirely
+    # attributable to location (beta and BWS).
+    shared = scored.groupby('annual_wue_l_per_kwh')['pswi'].size().idxmax()
+    near_wue_15 = scored[scored['annual_wue_l_per_kwh'] == shared]
     if len(near_wue_15) >= 2:
         worst_in_band = near_wue_15.loc[near_wue_15['pswi'].idxmax()]
         best_in_band  = near_wue_15.loc[near_wue_15['pswi'].idxmin()]
@@ -301,7 +308,8 @@ def figure_4_wue_vs_pswi():
                     arrowprops=dict(arrowstyle='<->', color=COLORS['worst'], lw=1.5))
         mid_x = (worst_in_band['annual_wue_l_per_kwh'] + best_in_band['annual_wue_l_per_kwh']) / 2
         mid_y = np.sqrt(worst_in_band['pswi'] * max(best_in_band['pswi'], 1e-6))
-        ax.text(mid_x * 1.05, mid_y, f'{ratio:.0f}× difference\n(same reported WUE)',
+        ax.text(mid_x * 1.03, mid_y, f'{ratio:.0f}× difference\n(same fleet WUE:\n'
+                f'{worst_in_band["facility_name"]} vs. {best_in_band["facility_name"]})',
                 fontsize=10, color=COLORS['worst'], fontweight='bold')
 
     ax.legend(title='Climate Zone', loc='upper left')
@@ -413,7 +421,7 @@ def figure_5_counterfactual():
 
     ax.set_xlabel('% of Fleet Workload Reallocated (worst third → best third by PSWI)')
     ax.set_ylabel('Reduction in Total Fleet PSWI Impact (%)')
-    ax.set_title('Counterfactual: PSWI-Aware Workload Reallocation Yields Outsized Stress Reductions',
+    ax.set_title('Counterfactual: Frictionless PSWI-Aware Workload Reallocation',
                  fontweight='bold', pad=14)
     ax.legend(loc='lower right')
     ax.grid(True, linestyle=':', alpha=0.5)
@@ -433,31 +441,29 @@ def figure_5_counterfactual():
 def figure_6_disclosure_compliance():
     """Show which companies disclose enough information to even be auditable.
 
-    For each company we score whether they publish:
-      A. Annual fleet-wide WUE
-      B. Site-specific WUE (per facility)
-      C. Peak / monthly WUE
-      D. Per-site water source (potable vs. reclaimed)
-      E. Per-site water withdrawal AND consumption (separate)
+    For each operator we record whether the documents cited in
+    datacenters.csv (reviewed Oct 2026) publish:
+      A. Fleet-wide WUE  (0.5 = not published, but derivable from
+         published fleet water and electricity totals)
+      B. Sub-fleet WUE   (1 = per site, 0.5 = per region)
+      C. Site-level water volumes (withdrawal and/or consumption)
+      D. Peak-day or monthly water data (any level)
+    0 means "not found in the reviewed documents", not a claim that the
+    operator holds no such data. xAI is shown for reference only (not in the
+    PSWI sample because it publishes no WUE).
     """
-    # Hand-coded based on actual review of 2024 sustainability reports
     disclosure_data = {
-        'Google':         [1, 1, 0, 0.5, 0.5],
-        'Microsoft':      [1, 0.5, 0, 0.5, 0],
-        'Meta':           [1, 0, 0, 0.5, 0],
-        'Amazon':         [1, 0, 0, 0, 0],
-        'Apple':          [1, 0.5, 0, 0.5, 0.5],
-        'Equinix':        [1, 0, 0, 0, 0],
-        'DigitalRealty':  [1, 0, 0, 0, 0],
-        'QTS':            [1, 0, 0, 0, 0],
-        'CyrusOne':       [1, 0, 0, 0, 0],
-        'xAI':            [0, 0, 0, 0, 0],
-        'Alibaba':        [0.5, 0, 0, 0, 0],
-        'Tencent':        [0.5, 0, 0, 0, 0],
+        'Google':         [0.5, 0,   1, 0],
+        'Meta':           [1,   0,   1, 0],
+        'Microsoft':      [1,   0.5, 0, 0],
+        'Amazon':         [1,   0,   0, 0],
+        'Equinix':        [1,   0,   0, 0],
+        'DigitalRealty':  [1,   0,   0, 0],
+        'QTS':            [1,   0,   0, 0],
+        'xAI':            [0,   0,   0, 0],
     }
-    categories = ['Annual fleet WUE', 'Site-specific WUE',
-                  'Peak / monthly WUE', 'Water source',
-                  'Withdrawal vs. consumption']
+    categories = ['Fleet WUE', 'Regional / site WUE',
+                  'Site-level water volume', 'Peak or monthly data']
 
     df = pd.DataFrame(disclosure_data, index=categories).T
     # Sort companies by total disclosure score
@@ -476,17 +482,17 @@ def figure_6_disclosure_compliance():
     for i in range(df.shape[0]):
         for j in range(df.shape[1]):
             v = df.iloc[i, j]
-            label = '✓' if v == 1 else ('partial' if v == 0.5 else '✗')
+            label = 'yes' if v == 1 else ('partial' if v == 0.5 else 'not found')
             color = 'black' if v >= 0.5 else 'white'
             ax.text(j, i, label, ha='center', va='center',
                     color=color, fontsize=10, fontweight='bold')
 
-    ax.set_title('Disclosure Compliance: Which Companies Publish Enough Data to Audit?',
+    ax.set_title('Water Disclosure by Operator (documents reviewed for this study)',
                  fontweight='bold', pad=14)
 
     cbar = plt.colorbar(im, ax=ax, fraction=0.025, pad=0.02)
     cbar.set_ticks([0, 0.5, 1.0])
-    cbar.set_ticklabels(['Not disclosed', 'Partial', 'Disclosed'])
+    cbar.set_ticklabels(['Not found', 'Partial', 'Published'])
 
     out = FIG / 'figure_6_disclosure.png'
     plt.savefig(out, bbox_inches='tight')
