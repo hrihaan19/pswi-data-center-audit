@@ -217,7 +217,10 @@ def company_aggregate(scored_df):
 # ---------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    DATA = Path(__file__).parent.parent / 'data'
+    # Works with a flat repository (CSVs beside this script) or with
+    # the nested code/ + data/ layout.
+    HERE = Path(__file__).resolve().parent
+    DATA = HERE if (HERE / 'datacenters.csv').exists() else HERE.parent / 'data'
 
     # Load datasets.
     dc      = pd.read_csv(DATA / 'datacenters.csv')

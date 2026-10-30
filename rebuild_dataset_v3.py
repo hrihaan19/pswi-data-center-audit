@@ -16,8 +16,10 @@ either published directly or derived arithmetically from published totals.
 from pathlib import Path
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent.parent
-DATA = ROOT / 'data'
+# Works with a flat repository (CSVs beside this script) or with the
+# nested code/ + data/ layout.
+HERE = Path(__file__).resolve().parent
+DATA = HERE if (HERE / 'datacenters_v2.csv').exists() else HERE.parent / 'data'
 
 dc = pd.read_csv(DATA / 'datacenters_v2.csv')
 log = []

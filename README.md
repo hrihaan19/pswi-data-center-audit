@@ -7,7 +7,7 @@
 
 This repository accompanies the preprint **"Hidden Currents: A Peak-Stress
 Water Index for Auditing AI Data Center Sustainability and Informing
-Disclosure Policy"** (version 3, October 2026), in `paper/main_v3.pdf`.
+Disclosure Policy"** (version 3, October 2026), in `main_v3.pdf`.
 
 ## Headline Findings (v3)
 
@@ -31,41 +31,37 @@ Disclosure Policy"** (version 3, October 2026), in `paper/main_v3.pdf`.
 - **Disclosure gap:** no audited operator publishes facility-level WUE or
   peak/monthly water data.
 
-## Repository Structure
+## Repository Contents
 
-```
-.
-├── code/
-│   ├── rebuild_dataset_v3.py   # Applies the documented v2 -> v3 data corrections
-│   ├── pswi_calculator.py      # Core PSWI computation
-│   ├── visualize.py            # Figures 1-6
-│   └── sensitivity.py          # Figures 7-11: beta sensitivity, bootstrap,
-│                               #   variance decomposition, counterfactual,
-│                               #   Scope 2, beta = 1 null specification
-├── data/
-│   ├── datacenters_v2.csv      # Earlier working dataset (kept for transparency)
-│   ├── datacenters.csv         # v3 dataset: 48 facilities, sourced WUE
-│   ├── dataset_changelog_v3.csv# Every change from v2 -> v3, with reasons
-│   ├── water_stress.csv        # Baseline water stress (WRI Aqueduct 4.0)
-│   ├── datacenters_scored.csv  # Facilities with computed PSWI
-│   ├── company_aggregates.csv  # Company-level rankings
-│   └── *.csv, sensitivity_output_v3.txt   # Analysis outputs
-├── figures/                     # 11 figures (300 DPI)
-├── paper/
-│   ├── main.tex, references.bib # LaTeX source (IEEEtran)
-│   └── main_v3.pdf             # Compiled preprint
-└── README.md
-```
+All files sit at the top level of the repository.
+
+| File | What it is |
+|---|---|
+| `main_v3.pdf` | The preprint (version 3) |
+| `main.tex`, `references.bib` | LaTeX source (IEEEtran) |
+| `datacenters.csv` | v3 dataset: 48 facilities, sourced WUE (`wue_basis`, `wue_source` columns) |
+| `datacenters_v2.csv` | Earlier working dataset, kept for transparency |
+| `dataset_changelog_v3.csv` | Every v2 → v3 change, with reasons |
+| `water_stress.csv` | Baseline water stress (WRI Aqueduct 4.0) |
+| `datacenters_scored.csv`, `company_aggregates.csv` | PSWI scores and company rankings |
+| `sensitivity_beta.csv`, `bootstrap_rank_shifts.csv`, `variance_decomposition.csv`, `beta_null_specification.csv`, `sensitivity_output_v3.txt` | Robustness-analysis outputs |
+| `figure_1` … `figure_11` (`.png`) | Figures (300 DPI) |
+| `rebuild_dataset_v3.py` | Applies the documented v2 → v3 corrections |
+| `pswi_calculator.py` | Core PSWI computation |
+| `visualize.py` | Figures 1–6 |
+| `sensitivity.py` | Figures 7–11: β sensitivity, bootstrap, variance decomposition, counterfactual, Scope 2, β = 1 null specification |
 
 ## Reproducing the Results
+
+From the repository folder:
 
 ```bash
 pip install pandas numpy scipy matplotlib
 
-python code/rebuild_dataset_v3.py   # v2 -> v3 dataset (logs every change)
-python code/pswi_calculator.py      # PSWI scores and company rankings
-python code/visualize.py            # Figures 1-6
-python code/sensitivity.py          # Figures 7-11 and robustness numbers
+python rebuild_dataset_v3.py   # v2 -> v3 dataset (logs every change)
+python pswi_calculator.py      # PSWI scores and company rankings
+python visualize.py            # Figures 1-6
+python sensitivity.py          # Figures 7-11 and robustness numbers
 ```
 
 ## Data Provenance and the v3 Correction
@@ -78,7 +74,7 @@ not be verified or did not meet the inclusion criteria (a duplicate Google
 site, Meta Richland Parish, AWS Coffeen IL, Digital Realty Salt Lake City,
 and xAI Memphis, for which no WUE is published). v3 replaces every WUE with
 a published or published-derived value and removes those five facilities.
-All 52 changes are logged in `data/dataset_changelog_v3.csv`.
+All 52 changes are logged in `dataset_changelog_v3.csv`.
 
 | Operator | WUE (L/kWh) | Year | Basis | Source |
 |---|---|---|---|---|

@@ -35,9 +35,14 @@ plt.rcParams.update({
     'axes.spines.right': False,
 })
 
-ROOT = Path(__file__).parent.parent
-DATA = ROOT / 'data'
-FIG  = ROOT / 'figures'
+# Works with a flat repository (CSVs and PNGs beside this script) or with
+# the nested code/ + data/ + figures/ layout.
+HERE = Path(__file__).resolve().parent
+if (HERE / 'datacenters_scored.csv').exists():
+    DATA = FIG = HERE
+else:
+    DATA = HERE.parent / 'data'
+    FIG  = HERE.parent / 'figures'
 
 # Color palette - colorblind-safe
 COLORS = {
